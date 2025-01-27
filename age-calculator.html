@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced BMI Calculator</title>
+    <title>Advanced Age Calculator</title>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -23,7 +23,7 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             padding: 30px;
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             text-align: center;
         }
 
@@ -61,6 +61,21 @@
             border-color: #007bff;
         }
 
+        .radio-group {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .radio-group label {
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .radio-group input {
+            margin-right: 8px;
+        }
+
         button {
             background: linear-gradient(135deg, #007bff, #5a5ad6);
             color: white;
@@ -96,59 +111,6 @@
             color: #007bff;
         }
 
-        .chart {
-            margin-top: 20px;
-            position: relative;
-            height: 40px;
-            background: linear-gradient(to right, #ff6b6b, #ffd93b, #6bcf63, #00c6ff);
-            border-radius: 15px;
-            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .chart::before {
-            content: 'Underweight';
-            position: absolute;
-            left: 5%;
-            top: -25px;
-            color: #333;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .chart::after {
-            content: 'Obesity';
-            position: absolute;
-            right: 5%;
-            top: -25px;
-            color: #333;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .chart span {
-            position: absolute;
-            top: -25px;
-            transform: translateX(-50%);
-            font-size: 14px;
-            font-weight: bold;
-            color: #007bff;
-        }
-
-        .indicator {
-            position: absolute;
-            height: 40px;
-            width: 10px;
-            background: #007bff;
-            border-radius: 5px;
-            top: 0;
-        }
-
-        .info {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #555;
-        }
-
         .footer {
             margin-top: 20px;
             font-size: 12px;
@@ -159,83 +121,108 @@
 </head>
 <body>
     <div class="container">
-        <h1>Advanced BMI Calculator</h1>
+        <h1>Advanced Age Calculator</h1>
 
         <div class="form-group">
-            <label for="weight">Weight (kg):</label>
-            <input type="number" id="weight" placeholder="Enter your weight">
+            <label for="birthYear">Year of Birth:</label>
+            <input type="number" id="birthYear" placeholder="Enter year of birth">
         </div>
 
         <div class="form-group">
-            <label for="height">Height (cm):</label>
-            <input type="number" id="height" placeholder="Enter your height">
+            <label for="birthMonth">Month of Birth:</label>
+            <input type="number" id="birthMonth" placeholder="Enter month of birth (1-12)">
         </div>
 
-        <button onclick="calculateBMI()">Calculate BMI</button>
+        <div class="form-group">
+            <label for="birthDate">Date of Birth:</label>
+            <input type="number" id="birthDate" placeholder="Enter date of birth (1-31)">
+        </div>
+
+        <div class="radio-group">
+            <label><input type="radio" name="dateChoice" value="today" checked onclick="toggleCustomDate(false)"> Today</label>
+            <label><input type="radio" name="dateChoice" value="custom" onclick="toggleCustomDate(true)"> Choose Date</label>
+        </div>
+
+        <div id="customDateFields" style="display: none;">
+            <div class="form-group">
+                <label for="customYear">Year:</label>
+                <input type="number" id="customYear" placeholder="Enter year">
+            </div>
+
+            <div class="form-group">
+                <label for="customMonth">Month:</label>
+                <input type="number" id="customMonth" placeholder="Enter month (1-12)">
+            </div>
+
+            <div class="form-group">
+                <label for="customDate">Date:</label>
+                <input type="number" id="customDate" placeholder="Enter date (1-31)">
+            </div>
+        </div>
+
+        <button onclick="calculateAge()">Calculate Age</button>
 
         <div class="result" id="result" style="display: none;">
-            Your BMI is <span id="bmiValue"></span> (<span id="bmiCategory"></span>).
+            Age as of <span id="selectedDate"></span> is <span id="ageYears"></span> years, <span id="ageMonths"></span> months, and <span id="ageDays"></span> days old.
         </div>
-
-        <div class="chart">
-            <span id="bmiIndicatorLabel" style="display: none;"></span>
-            <div class="indicator" id="bmiIndicator" style="display: none;"></div>
-        </div>
-
-        <p class="info">* BMI Categories: <br>
-            Underweight: &lt; 18.5 | Normal: 18.5 - 24.9 | Overweight: 25 - 29.9 | Obesity: &gt;= 30
-        </p>
 
         <div class="footer">
-            Built with ❤️ for a healthier you!
+            Built with ❤️ for timeless calculations!
         </div>
     </div>
 
     <script>
-        function calculateBMI() {
-            const weight = parseFloat(document.getElementById('weight').value);
-            const height = parseFloat(document.getElementById('height').value);
-            const resultDiv = document.getElementById('result');
-            const bmiValueElement = document.getElementById('bmiValue');
-            const bmiCategoryElement = document.getElementById('bmiCategory');
-            const bmiIndicator = document.getElementById('bmiIndicator');
-            const bmiIndicatorLabel = document.getElementById('bmiIndicatorLabel');
+        function toggleCustomDate(show) {
+            document.getElementById('customDateFields').style.display = show ? 'block' : 'none';
+        }
 
-            if (!weight || !height || weight <= 0 || height <= 0) {
-                alert('Please enter valid positive values for weight and height.');
+        function calculateAge() {
+            const birthYear = parseInt(document.getElementById('birthYear').value);
+            const birthMonth = parseInt(document.getElementById('birthMonth').value);
+            const birthDate = parseInt(document.getElementById('birthDate').value);
+
+            const useCustomDate = document.querySelector('input[name="dateChoice"]:checked').value === 'custom';
+
+            const now = useCustomDate
+                ? new Date(
+                    parseInt(document.getElementById('customYear').value),
+                    parseInt(document.getElementById('customMonth').value) - 1,
+                    parseInt(document.getElementById('customDate').value)
+                )
+                : new Date();
+
+            if (isNaN(birthYear) || isNaN(birthMonth) || isNaN(birthDate)) {
+                alert('Please enter valid birth date values.');
                 return;
             }
 
-            const heightInMeters = height / 100;
-            const bmi = (weight / (heightInMeters ** 2)).toFixed(1);
+            const birth = new Date(birthYear, birthMonth - 1, birthDate);
 
-            let category = '';
-            let position = 0;
-
-            if (bmi < 18.5) {
-                category = 'Underweight';
-                position = (bmi / 18.5) * 25;
-            } else if (bmi >= 18.5 && bmi <= 24.9) {
-                category = 'Normal';
-                position = 25 + ((bmi - 18.5) / (24.9 - 18.5)) * 25;
-            } else if (bmi >= 25 && bmi <= 29.9) {
-                category = 'Overweight';
-                position = 50 + ((bmi - 25) / (29.9 - 25)) * 25;
-            } else {
-                category = 'Obesity';
-                position = 75 + ((bmi - 30) / 10) * 25;
+            if (birth > now || birth.getFullYear() !== birthYear || birth.getMonth() + 1 !== birthMonth || birth.getDate() !== birthDate) {
+                alert('Invalid birth date. Please check your inputs.');
+                return;
             }
 
-            bmiValueElement.textContent = bmi;
-            bmiCategoryElement.textContent = category;
-            resultDiv.style.display = 'block';
+            let years = now.getFullYear() - birth.getFullYear();
+            let months = now.getMonth() - birth.getMonth();
+            let days = now.getDate() - birth.getDate();
 
-            bmiIndicator.style.left = `${position}%`;
-            bmiIndicator.style.display = 'block';
+            if (days < 0) {
+                months--;
+                days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+            }
 
-            bmiIndicatorLabel.textContent = category;
-            bmiIndicatorLabel.style.left = `${position}%`;
-            bmiIndicatorLabel.style.display = 'block';
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            document.getElementById('selectedDate').textContent = now.toLocaleDateString();
+            document.getElementById('ageYears').textContent = years;
+            document.getElementById('ageMonths').textContent = months;
+            document.getElementById('ageDays').textContent = days;
+
+            document.getElementById('result').style.display = 'block';
         }
     </script>
 </body>
